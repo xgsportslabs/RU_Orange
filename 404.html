@@ -19,16 +19,18 @@
       height: 100%;
       background: #202124;
       font-family: Arial, sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     iframe {
       border: 0;
-      width: 100vw;
-      height: 100vh;
       display: block;
+      background: transparent;
     }
 
-    /* splash while loading */
+    /* Splash while loading */
     #splash {
       position: fixed;
       inset: 0;
@@ -58,10 +60,19 @@
   const isMobile = /Android|iPhone|iPad|iPod/i.test(ua);
 
   const mobileEmbed = "https://lookerstudio.google.com/embed/reporting/19fb639e-3918-4b35-8152-d7ec268a7507/page/RJQlF";
-  const webEmbed    = "https://lookerstudio.google.com/embed/reporting/2113149b-db81-406c-8456-3d80d2fba248/page/RJQlF";
+  const webEmbed = "https://lookerstudio.google.com/embed/reporting/2113149b-db81-406c-8456-3d80d2fba248/page/RJQlF";
 
   const frame = document.getElementById("frame");
-  frame.src = isMobile ? mobileEmbed : webEmbed;
+
+  if (isMobile) {
+    frame.style.width = "375px";
+    frame.style.height = "900px";
+    frame.src = mobileEmbed;
+  } else {
+    frame.style.width = "600px";
+    frame.style.height = "450px";
+    frame.src = webEmbed;
+  }
 
   frame.onload = () => {
     document.getElementById("splash").style.display = "none";
