@@ -21,7 +21,7 @@
       font-family: Arial, sans-serif;
     }
 
-    /* Splash screen */
+    /* Splash screen while iframe loads */
     #splash {
       position: fixed;
       inset: 0;
@@ -37,7 +37,7 @@
       height: 96px;
     }
 
-    /* Mobile fullscreen */
+    /* Mobile: fullscreen app */
     @media (max-width: 900px) {
       body { overflow: hidden; }
 
@@ -49,22 +49,22 @@
       }
     }
 
-    /* Desktop big canvas (no inner scroll) */
+    /* Desktop: BIG iframe so no inner scrollbars */
     @media (min-width: 901px) {
       body {
-        overflow: auto;
+        overflow: auto;   /* page scrolls, not iframe */
         background: #202124;
       }
 
       .frame-wrap {
         padding: 24px;
         background: #202124;
-        overflow: visible;
+        overflow: visible; /* critical: prevents inner scroll area */
       }
 
       iframe {
-        width: 1500px;
-        height: 2200px;
+        width: 1500px;     /* wide canvas */
+        height: 2200px;    /* tall enough to fit full report */
         border: 0;
         display: block;
         margin: 0 auto;
@@ -76,7 +76,7 @@
 
 <body>
 
-  <!-- Splash to prevent white flash -->
+  <!-- Splash to hide white flash -->
   <div id="splash">
     <img src="logo-192.png" alt="xG Portal">
   </div>
@@ -90,31 +90,17 @@
   </div>
 
   <script>
-    const ua = navigator.userAgent;
-
-    const isMobile = /Android|iPhone|iPad|iPod/i.test(ua);
-    const isIPhoneSafari =
-      /iPhone/.test(ua) && /Safari/.test(ua) && !/CriOS|FxiOS/.test(ua);
+    const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 
     const mobileEmbed = "https://lookerstudio.google.com/embed/reporting/19fb639e-3918-4b35-8152-d7ec268a7507/page/RJQlF";
     const webEmbed    = "https://lookerstudio.google.com/embed/reporting/2113149b-db81-406c-8456-3d80d2fba248/page/RJQlF";
 
-    const mobileDirect = "https://lookerstudio.google.com/reporting/19fb639e-3918-4b35-8152-d7ec268a7507/page/RJQlF";
-    const webDirect    = "https://lookerstudio.google.com/reporting/2113149b-db81-406c-8456-3d80d2fba248/page/RJQlF";
-
     const frame = document.getElementById("frame");
+    frame.src = isMobile ? mobileEmbed : webEmbed;
 
-    if (isIPhoneSafari) {
-      // Redirect so cookies are first-party (no warning)
-      window.location.href = isMobile ? mobileDirect : webDirect;
-    } else {
-      // Embedded app experience
-      frame.src = isMobile ? mobileEmbed : webEmbed;
-
-      frame.onload = () => {
-        document.getElementById("splash").style.display = "none";
-      };
-    }
+    frame.onload = () => {
+      document.getElementById("splash").style.display = "none";
+    };
   </script>
 
 </body>
