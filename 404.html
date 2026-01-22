@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>xG Portal</title>
+
+  <!-- PWA / icons -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="favicon.ico">
+  <link rel="apple-touch-icon" href="logo-192.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="xG Portal">
+
+  <style>
+    html, body { margin: 0; height: 100%; background: #fff; }
+
+    /* Mobile: app-like full screen */
+    @media (max-width: 900px) {
+      body { overflow: hidden; }
+      iframe { width: 100vw; height: 100vh; border: 0; display: block; }
+    }
+
+    /* Desktop: scrollable "canvas" + normal zoom controls */
+    @media (min-width: 901px) {
+      body { overflow: auto; }
+      .frame-wrap {
+        min-height: 100vh;
+        overflow: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+      iframe {
+        width: 1200px;   /* increase if you want less “squeezed” */
+        height: 900px;   /* adjust to taste */
+        border: 0;
+        display: block;
+        margin: 0 auto;  /* center */
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="frame-wrap">
+    <iframe
+      id="frame"
+      sandbox="allow-storage-access-by-user-activation allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"
+      allowfullscreen>
+    </iframe>
+  </div>
+
+  <script>
+    const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+    const mobileEmbed = "https://lookerstudio.google.com/embed/reporting/19fb639e-3918-4b35-8152-d7ec268a7507/page/RJQlF";
+    const webEmbed    = "https://lookerstudio.google.com/embed/reporting/2113149b-db81-406c-8456-3d80d2fba248/page/RJQlF";
+
+    document.getElementById("frame").src = isMobile ? mobileEmbed : webEmbed;
+  </script>
+</body>
+</html>
