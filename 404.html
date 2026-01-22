@@ -31,52 +31,56 @@
       justify-content: center;
       z-index: 9999;
     }
-
     #splash img {
       width: 96px;
       height: 96px;
     }
 
-    /* Mobile: fullscreen app */
-    @media (max-width: 900px) {
-      body { overflow: hidden; }
+    /* Base iframe */
+    iframe {
+      border: 0;
+      display: block;
+      background: transparent;
+    }
 
+    /* Mobile defaults:
+       - allow PAGE scrolling (fixes Android installed-app scrolling problems)
+       - make iframe full width
+    */
+    @media (max-width: 900px) {
+      body { overflow: auto; }
+      .frame-wrap {
+        padding: 0;
+        background: #202124;
+        overflow: visible;
+      }
       iframe {
         width: 100vw;
-        height: 100vh;
-        border: 0;
-        display: block;
+        height: 100dvh; /* modern mobile viewport height */
       }
     }
 
     /* Desktop: BIG iframe so no inner scrollbars */
     @media (min-width: 901px) {
       body {
-        overflow: auto;   /* page scrolls, not iframe */
+        overflow: auto;
         background: #202124;
       }
-
       .frame-wrap {
         padding: 24px;
         background: #202124;
-        overflow: visible; /* critical: prevents inner scroll area */
+        overflow: visible;
       }
-
       iframe {
-        width: 1500px;     /* wide canvas */
-        height: 2200px;    /* tall enough to fit full report */
-        border: 0;
-        display: block;
+        width: 1500px;
+        height: 2200px;
         margin: 0 auto;
-        background: transparent;
       }
     }
   </style>
 </head>
 
 <body>
-
-  <!-- Splash to hide white flash -->
   <div id="splash">
     <img src="logo-192.png" alt="xG Portal">
   </div>
@@ -90,35 +94,38 @@
   </div>
 
   <script>
-    // Detect iPhone specifically (not iPad)
     const ua = navigator.userAgent || "";
-    const isIPhone = /iPhone/i.test(ua) && !/iPad/i.test(ua);
 
-    // General mobile detection
+    const isIPhone = /iPhone/i.test(ua) && !/iPad/i.test(ua);
+    const isAndroid = /Android/i.test(ua);
     const isMobile = /Android|iPhone|iPad|iPod/i.test(ua);
 
-    // LINKS
-    // iPhone: use the share link to avoid cookie issues
-    const iPhoneDirectMobileLink = "https://lookerstudio.google.com/s/j2af-Nie_no";
+    // iPhone: use share link (cookie-less) BUT keep it inside iframe to avoid blur/scaling quirks
+    const iPhoneShareLink = "https://lookerstudio.google.com/s/j2af-Nie_no";
 
-    // Other devices: keep using embeds
+    // Others: embeds
     const mobileEmbed = "https://lookerstudio.google.com/embed/reporting/19fb639e-3918-4b35-8152-d7ec268a7507/page/RJQlF";
     const webEmbed    = "https://lookerstudio.google.com/embed/reporting/2113149b-db81-406c-8456-3d80d2fba248/page/RJQlF";
 
     const frame = document.getElementById("frame");
 
-    if (isIPhone) {
-      // Go directly to the mobile share link (leaves the GitHub page)
-      window.location.replace(iPhoneDirectMobileLink);
-    } else {
-      // Stay embedded for everyone else
-      frame.src = isMobile ? mobileEmbed : webEmbed;
-
-      frame.onload = () => {
-        document.getElementById("splash").style.display = "none";
-      };
+    // ANDROID FIX:
+    // Instead of relying on scrolling inside the iframe, make it "very tall"
+    // so the PAGE scrolls all the way to the bottom.
+    if (isAndroid) {
+      frame.style.height = "2600px"; // adjust up/down if needed (2400–3200 are common)
     }
-  </script>
 
+    // Choose source
+    if (isIPhone) {
+      frame.src = iPhoneShareLink;
+    } else {
+      frame.src = isMobile ? mobileEmbed : webEmbed;
+    }
+
+    frame.onload = () => {
+      document.getElementById("splash").style.display = "none";
+    };
+  </script>
 </body>
 </html>
