@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>xG Portal</title>
 
   <!-- PWA / icons -->
@@ -19,9 +19,10 @@
       height: 100%;
       background: #202124;
       font-family: Arial, sans-serif;
+      color: #fff;
     }
 
-    /* Splash screen while iframe loads */
+    /* Splash screen while iframe loads (non-iPhone paths) */
     #splash {
       position: fixed;
       inset: 0;
@@ -31,61 +32,92 @@
       justify-content: center;
       z-index: 9999;
     }
-    #splash img {
+    #splash img { width: 96px; height: 96px; }
+
+    iframe { border: 0; display: block; background: transparent; }
+
+    /* iPhone setup screen (when not installed yet) */
+    #iphoneSetup {
+      display: none;
+      height: 100%;
+      padding: 32px 20px;
+      box-sizing: border-box;
+      text-align: center;
+    }
+    #iphoneSetup .card {
+      max-width: 460px;
+      margin: 0 auto;
+    }
+    #iphoneSetup img {
       width: 96px;
       height: 96px;
+      margin: 24px 0;
+    }
+    #iphoneSetup h1 {
+      font-size: 22px;
+      margin: 0 0 10px 0;
+      font-weight: 700;
+    }
+    #iphoneSetup p {
+      opacity: 0.9;
+      line-height: 1.4;
+      margin: 0 0 18px 0;
+    }
+    #iphoneSetup a {
+      display: inline-block;
+      margin-top: 10px;
+      padding: 12px 16px;
+      border-radius: 10px;
+      background: #0b5fff;
+      color: #fff;
+      text-decoration: none;
+      font-size: 16px;
+    }
+    #iphoneSetup .hint {
+      margin-top: 14px;
+      font-size: 14px;
+      opacity: 0.85;
     }
 
-    /* Base iframe */
-    iframe {
-      border: 0;
-      display: block;
-      background: transparent;
-    }
-
-    /* Mobile defaults:
-       - allow PAGE scrolling (fixes Android installed-app scrolling problems)
-       - make iframe full width
-    */
+    /* Mobile defaults: allow page scrolling */
     @media (max-width: 900px) {
       body { overflow: auto; }
-      .frame-wrap {
-        padding: 0;
-        background: #202124;
-        overflow: visible;
-      }
-      iframe {
-        width: 100vw;
-        height: 100dvh; /* modern mobile viewport height */
-      }
+      .frame-wrap { padding: 0; background: #202124; overflow: visible; }
+      iframe { width: 100vw; height: 100dvh; }
     }
 
     /* Desktop: BIG iframe so no inner scrollbars */
     @media (min-width: 901px) {
-      body {
-        overflow: auto;
-        background: #202124;
-      }
-      .frame-wrap {
-        padding: 24px;
-        background: #202124;
-        overflow: visible;
-      }
-      iframe {
-        width: 1500px;
-        height: 2200px;
-        margin: 0 auto;
-      }
+      body { overflow: auto; background: #202124; }
+      .frame-wrap { padding: 24px; background: #202124; overflow: visible; }
+      iframe { width: 1500px; height: 2200px; margin: 0 auto; }
     }
   </style>
 </head>
 
 <body>
+  <!-- Splash (used for embed paths) -->
   <div id="splash">
     <img src="logo-192.png" alt="xG Portal">
   </div>
 
-  <div class="frame-wrap">
+  <!-- iPhone setup screen (only shown when iPhone + not installed yet) -->
+  <div id="iphoneSetup">
+    <div class="card">
+      <img src="logo-192.png" alt="xG Portal">
+      <h1>xG Portal</h1>
+      <p>
+        To launch cleanly without cookie prompts, add this to your Home Screen.
+      </p>
+      <p class="hint">
+        In Safari: Share → <b>Add to Home Screen</b>
+      </p>
+      <a id="openNow" href="#" rel="noopener">Open now</a>
+    </div>
+  </div>
+
+  <!-- Embed container (Android + Desktop + non-iPhone mobile) -->
+  <div class="frame-wrap" id="embedWrap">
     <iframe
       id="frame"
       sandbox="allow-storage-access-by-user-activation allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"
@@ -100,32 +132,19 @@
     const isAndroid = /Android/i.test(ua);
     const isMobile = /Android|iPhone|iPad|iPod/i.test(ua);
 
-    // iPhone: use share link (cookie-less) BUT keep it inside iframe to avoid blur/scaling quirks
-    const iPhoneShareLink = "https://lookerstudio.google.com/s/j2af-Nie_no";
+    // iPhone cookie-less destination (TOP-LEVEL only; iframe often blocked)
+    const iPhoneDirectLink = "https://lookerstudio.google.com/s/j2af-Nie_no";
 
-    // Others: embeds
+    // Embed links for others
     const mobileEmbed = "https://lookerstudio.google.com/embed/reporting/19fb639e-3918-4b35-8152-d7ec268a7507/page/RJQlF";
     const webEmbed    = "https://lookerstudio.google.com/embed/reporting/2113149b-db81-406c-8456-3d80d2fba248/page/RJQlF";
 
+    // Detect standalone (installed) mode
+    const isStandalone =
+      (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches) ||
+      window.navigator.standalone === true;
+
+    const splash = document.getElementById("splash");
     const frame = document.getElementById("frame");
-
-    // ANDROID FIX:
-    // Instead of relying on scrolling inside the iframe, make it "very tall"
-    // so the PAGE scrolls all the way to the bottom.
-    if (isAndroid) {
-      frame.style.height = "2600px"; // adjust up/down if needed (2400–3200 are common)
-    }
-
-    // Choose source
-    if (isIPhone) {
-      frame.src = iPhoneShareLink;
-    } else {
-      frame.src = isMobile ? mobileEmbed : webEmbed;
-    }
-
-    frame.onload = () => {
-      document.getElementById("splash").style.display = "none";
-    };
-  </script>
-</body>
-</html>
+    const embedWrap = document.getElementById("embedWrap");
+    const iphoneSetup = document.get
