@@ -10,45 +10,16 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Dashboards">
 
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      margin-top: 25vh;
-      background: white;
-    }
-    img {
-      width: 120px;
-      margin-bottom: 40px;
-    }
-    button {
-      font-size: 20px;
-      padding: 15px 30px;
-      border-radius: 8px;
-      border: none;
-      background: #0b5fff;
-      color: white;
-    }
-  </style>
+  <script>
+    const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+    const mobileURL = "https://lookerstudio.google.com/reporting/19fb639e-3918-4b35-8152-d7ec268a7507/page/p_0jked4t1zd";
+    const webURL = "https://lookerstudio.google.com/reporting/2113149b-db81-406c-8456-3d80d2fba248/page/RJQlF";
+
+    window.location.replace(isMobile ? mobileURL : webURL);
+  </script>
 </head>
 <body>
-
-  <img src="logo-192.png" alt="Logo">
-
-  <h2>Open Dashboard</h2>
-
-  <button onclick="go()">Open</button>
-
-  <script>
-    function go() {
-      const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-
-      const mobileURL = "https://lookerstudio.google.com/reporting/19fb639e-3918-4b35-8152-d7ec268a7507/page/p_0jked4t1zd";
-      const webURL = "https://lookerstudio.google.com/reporting/2113149b-db81-406c-8456-3d80d2fba248/page/RJQlF";
-
-      window.location.href = isMobile ? mobileURL : webURL;
-    }
-  </script>
-
+  Redirecting…
 </body>
 </html>
