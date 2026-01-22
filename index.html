@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>xG Portal</title>
 
-  <!-- Icons / PWA -->
+  <!-- PWA / icons -->
   <link rel="manifest" href="manifest.json">
   <link rel="icon" href="favicon.ico">
   <link rel="apple-touch-icon" href="logo-192.png">
@@ -18,50 +18,55 @@
       margin: 0;
       height: 100%;
       background: #202124;
+      font-family: Arial, sans-serif;
+    }
+
+    iframe {
+      border: 0;
+      width: 100vw;
+      height: 100vh;
+      display: block;
+    }
+
+    /* splash while loading */
+    #splash {
+      position: fixed;
+      inset: 0;
+      background: #202124;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-family: Arial, sans-serif;
-      color: white;
-    }
-
-    .frame {
-      text-align: center;
-      opacity: 0.9;
-    }
-
-    .frame img {
-      width: 110px;
-      margin-bottom: 20px;
-    }
-
-    .frame p {
-      margin: 0;
-      font-size: 18px;
-      letter-spacing: 0.5px;
+      z-index: 9999;
     }
   </style>
-
-  <script>
-    // Small delay so the branded screen actually renders before redirect
-    window.onload = () => {
-      const ua = navigator.userAgent || "";
-      const isMobile = /Android|iPhone|iPad|iPod/i.test(ua);
-
-      const mobileURL = "https://lookerstudio.google.com/s/j2af-Nie_no";
-      const webURL = "https://lookerstudio.google.com/reporting/2113149b-db81-406c-8456-3d80d2fba248/page/RJQlF";
-
-      setTimeout(() => {
-        window.location.replace(isMobile ? mobileURL : webURL);
-      }, 600); // enough time to show branding
-    };
-  </script>
 </head>
 
 <body>
-  <div class="frame">
-    <img src="logo-192.png" alt="xG Portal">
-    <p>Opening xG Portal…</p>
-  </div>
+
+<div id="splash">
+  <img src="logo-192.png" width="96" />
+</div>
+
+<iframe
+  id="frame"
+  sandbox="allow-storage-access-by-user-activation allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"
+  allowfullscreen>
+</iframe>
+
+<script>
+  const ua = navigator.userAgent || "";
+  const isMobile = /Android|iPhone|iPad|iPod/i.test(ua);
+
+  const mobileEmbed = "https://lookerstudio.google.com/embed/reporting/19fb639e-3918-4b35-8152-d7ec268a7507/page/RJQlF";
+  const webEmbed    = "https://lookerstudio.google.com/embed/reporting/2113149b-db81-406c-8456-3d80d2fba248/page/RJQlF";
+
+  const frame = document.getElementById("frame");
+  frame.src = isMobile ? mobileEmbed : webEmbed;
+
+  frame.onload = () => {
+    document.getElementById("splash").style.display = "none";
+  };
+</script>
+
 </body>
 </html>
