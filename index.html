@@ -11,30 +11,45 @@
   <link rel="apple-touch-icon" href="logo-192.png">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="xG Portal">
+  <meta name="theme-color" content="#202124">
 
   <style>
-    html, body { margin: 0; height: 100%; background: #fff; }
-
-    /* Mobile: app-like full screen */
-    @media (max-width: 900px) {
-      body { overflow: hidden; }
-      iframe { width: 100vw; height: 100vh; border: 0; display: block; }
+    html, body {
+      margin: 0;
+      height: 100%;
+      background: #202124;
+      font-family: Arial, sans-serif;
     }
 
-    /* Desktop: scrollable "canvas" + normal zoom controls */
+    /* Mobile: true app-like fullscreen */
+    @media (max-width: 900px) {
+      body { overflow: hidden; }
+      iframe {
+        width: 100vw;
+        height: 100vh;
+        border: 0;
+        display: block;
+      }
+    }
+
+    /* Desktop: scrollable canvas + normal zoom behavior */
     @media (min-width: 901px) {
       body { overflow: auto; }
+
       .frame-wrap {
         min-height: 100vh;
         overflow: auto;
         -webkit-overflow-scrolling: touch;
+        padding: 20px 0;
       }
+
       iframe {
-        width: 1200px;   /* increase if you want less “squeezed” */
-        height: 900px;   /* adjust to taste */
+        width: 1400px;   /* wider = less squished */
+        height: 900px;
         border: 0;
         display: block;
-        margin: 0 auto;  /* center */
+        margin: 0 auto;  /* center on page */
+        background: #202124;
       }
     }
   </style>
