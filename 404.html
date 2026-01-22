@@ -11,36 +11,77 @@
   <link rel="apple-touch-icon" href="logo-192.png">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="xG Portal">
+  <meta name="theme-color" content="#202124">
 
   <style>
-    html, body { margin: 0; height: 100%; background: #fff; }
-
-    /* Mobile: app-like full screen */
-    @media (max-width: 900px) {
-      body { overflow: hidden; }
-      iframe { width: 100vw; height: 100vh; border: 0; display: block; }
+    html, body {
+      margin: 0;
+      height: 100%;
+      background: #202124;
+      font-family: Arial, sans-serif;
     }
 
-    /* Desktop: scrollable "canvas" + normal zoom controls */
+    /* Splash screen while iframe loads */
+    #splash {
+      position: fixed;
+      inset: 0;
+      background: #202124;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+    }
+
+    #splash img {
+      width: 96px;
+      height: 96px;
+    }
+
+    /* Mobile: true app-like fullscreen */
+    @media (max-width: 900px) {
+      body { overflow: hidden; }
+
+      iframe {
+        width: 100vw;
+        height: 100vh;
+        border: 0;
+        display: block;
+      }
+    }
+
+    /* Desktop: scrollable canvas + zoom friendly */
     @media (min-width: 901px) {
-      body { overflow: auto; }
+      body {
+        overflow: auto;
+        background: #202124;
+      }
+
       .frame-wrap {
         min-height: 100vh;
         overflow: auto;
-        -webkit-overflow-scrolling: touch;
+        padding: 24px;
+        background: #202124;
       }
+
       iframe {
-        width: 1200px;   /* increase if you want less “squeezed” */
-        height: 900px;   /* adjust to taste */
+        width: 1400px;
+        height: 900px;
         border: 0;
         display: block;
-        margin: 0 auto;  /* center */
+        margin: 0 auto;
+        background: transparent;
       }
     }
   </style>
 </head>
 
 <body>
+
+  <!-- Dark splash to prevent white flash -->
+  <div id="splash">
+    <img src="logo-192.png" alt="xG Portal">
+  </div>
+
   <div class="frame-wrap">
     <iframe
       id="frame"
@@ -55,7 +96,13 @@
     const mobileEmbed = "https://lookerstudio.google.com/embed/reporting/19fb639e-3918-4b35-8152-d7ec268a7507/page/RJQlF";
     const webEmbed    = "https://lookerstudio.google.com/embed/reporting/2113149b-db81-406c-8456-3d80d2fba248/page/RJQlF";
 
-    document.getElementById("frame").src = isMobile ? mobileEmbed : webEmbed;
+    const frame = document.getElementById("frame");
+    frame.src = isMobile ? mobileEmbed : webEmbed;
+
+    frame.onload = () => {
+      document.getElementById("splash").style.display = "none";
+    };
   </script>
+
 </body>
 </html>
