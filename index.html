@@ -90,17 +90,32 @@
   </div>
 
   <script>
-    const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    const ua = navigator.userAgent;
+
+    // iPhone Safari detection (avoid Google iframe cookie prompt)
+    const isIPhoneSafari =
+      /iPhone/.test(ua) && /Safari/.test(ua) && !/CriOS|FxiOS/.test(ua);
+
+    const isMobile = /Android|iPhone|iPad|iPod/i.test(ua);
 
     const mobileEmbed = "https://lookerstudio.google.com/embed/reporting/19fb639e-3918-4b35-8152-d7ec268a7507/page/RJQlF";
     const webEmbed    = "https://lookerstudio.google.com/embed/reporting/2113149b-db81-406c-8456-3d80d2fba248/page/RJQlF";
 
-    const frame = document.getElementById("frame");
-    frame.src = isMobile ? mobileEmbed : webEmbed;
+    // Direct (non-embed) mobile link for iPhone Safari to keep cookies first-party
+    const mobileDirect = "https://lookerstudio.google.com/reporting/19fb639e-3918-4b35-8152-d7ec268a7507/page/p_0jked4t1zd";
 
-    frame.onload = () => {
-      document.getElementById("splash").style.display = "none";
-    };
+    if (isIPhoneSafari) {
+      // Go straight to the mobile website on iPhone Safari (no third-party cookie prompt)
+      window.location.replace(mobileDirect);
+    } else {
+      // Everyone else uses the embedded experience you liked
+      const frame = document.getElementById("frame");
+      frame.src = isMobile ? mobileEmbed : webEmbed;
+
+      frame.onload = () => {
+        document.getElementById("splash").style.display = "none";
+      };
+    }
   </script>
 
 </body>
