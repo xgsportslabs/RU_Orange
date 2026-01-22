@@ -35,19 +35,6 @@
       margin: 0 auto;
       background: transparent;
     }
-
-    /* Mobile layout base */
-    @media (max-width: 900px) {
-      body { overflow: auto; }
-    }
-
-    /* Desktop canvas */
-    @media (min-width: 901px) {
-      iframe {
-        width: 1500px;
-        height: 2200px;
-      }
-    }
   </style>
 </head>
 
@@ -76,14 +63,14 @@
   const frame = document.getElementById("frame");
 
   if (isIPhone) {
-    // iPhone: cookie-less share link, crisp
+    // iPhone: cookie-less share link
     frame.style.width = "375px";
     frame.style.height = "900px";
     frame.src = iPhoneShareLink;
 
   } else if (isAndroid) {
-    // Android: taller mobile embed
-    frame.style.width = "375px";
+    // Android: wider & taller to keep ratio
+    frame.style.width = "500px";
     frame.style.height = "1200px";
     frame.src = mobileEmbed;
 
