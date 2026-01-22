@@ -10,16 +10,36 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Dashboards">
 
-  <script>
-    const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-
-    const mobileURL = "https://lookerstudio.google.com/reporting/19fb639e-3918-4b35-8152-d7ec268a7507/page/p_0jked4t1zd";
-    const webURL = "https://lookerstudio.google.com/reporting/2113149b-db81-406c-8456-3d80d2fba248/page/RJQlF";
-
-    window.location.replace(isMobile ? mobileURL : webURL);
-  </script>
+  <style>
+    html, body {
+      margin: 0;
+      height: 100%;
+      overflow: hidden;
+      background: white;
+    }
+    iframe {
+      border: none;
+      width: 100%;
+      height: 100%;
+    }
+  </style>
 </head>
 <body>
-  Redirecting…
+
+<iframe id="frame"
+  sandbox="allow-storage-access-by-user-activation allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"
+  allowfullscreen>
+</iframe>
+
+<script>
+  const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+  const mobileEmbed = "https://lookerstudio.google.com/embed/reporting/19fb639e-3918-4b35-8152-d7ec268a7507/page/RJQlF";
+  const webEmbed = "https://lookerstudio.google.com/embed/reporting/2113149b-db81-406c-8456-3d80d2fba248/page/RJQlF";
+
+  document.getElementById("frame").src =
+    isMobile ? mobileEmbed : webEmbed;
+</script>
+
 </body>
 </html>
