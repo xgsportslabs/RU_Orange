@@ -21,7 +21,7 @@
       font-family: Arial, sans-serif;
     }
 
-    /* Splash screen */
+    /* Splash screen while iframe loads */
     #splash {
       position: fixed;
       inset: 0;
@@ -31,28 +31,77 @@
       justify-content: center;
       z-index: 9999;
     }
+
     #splash img {
       width: 96px;
       height: 96px;
     }
 
-    /* MOBILE: allow scrolling (fix for Android PWA/Chrome) */
+    /* Mobile: fullscreen app */
     @media (max-width: 900px) {
-      body {
-        overflow: auto;                 /* IMPORTANT: do NOT hide overflow */
-        -webkit-overflow-scrolling: touch;
-      }
-
-      .frame-wrap {
-        height: 100vh;                  /* viewport-sized container */
-        overflow: auto;                 /* scroll happens here if needed */
-        -webkit-overflow-scrolling: touch;
-        background: #202124;
-      }
+      body { overflow: hidden; }
 
       iframe {
         width: 100vw;
         height: 100vh;
         border: 0;
         display: block;
-        touch-action: pan-x pan-y;      /* helps touch scrolling in some cases */
+      }
+    }
+
+    /* Desktop: BIG iframe so no inner scrollbars */
+    @media (min-width: 901px) {
+      body {
+        overflow: auto;   /* page scrolls, not iframe */
+        background: #202124;
+      }
+
+      .frame-wrap {
+        padding: 24px;
+        background: #202124;
+        overflow: visible; /* critical: prevents inner scroll area */
+      }
+
+      iframe {
+        width: 1500px;     /* wide canvas */
+        height: 2200px;    /* tall enough to fit full report */
+        border: 0;
+        display: block;
+        margin: 0 auto;
+        background: transparent;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Splash to hide white flash -->
+  <div id="splash">
+    <img src="logo-192.png" alt="xG Portal">
+  </div>
+
+  <div class="frame-wrap">
+    <iframe
+      id="frame"
+      sandbox="allow-storage-access-by-user-activation allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"
+      allowfullscreen>
+    </iframe>
+  </div>
+
+  <script>
+    const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+    const mobileEmbed = "https://lookerstudio.google.com/embed/reporting/19fb639e-3918-4b35-8152-d7ec268a7507/page/RJQlF";
+    const webEmbed    = "https://lookerstudio.google.com/embed/reporting/2113149b-db81-406c-8456-3d80d2fba248/page/RJQlF";
+
+    const frame = document.getElementById("frame");
+    frame.src = isMobile ? mobileEmbed : webEmbed;
+
+    frame.onload = () => {
+      document.getElementById("splash").style.display = "none";
+    };
+  </script>
+
+</body>
+</html>
