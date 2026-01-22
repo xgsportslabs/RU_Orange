@@ -37,7 +37,7 @@
       height: 96px;
     }
 
-    /* Mobile: true app-like fullscreen */
+    /* Mobile: fullscreen app */
     @media (max-width: 900px) {
       body { overflow: hidden; }
 
@@ -49,23 +49,22 @@
       }
     }
 
-    /* Desktop: scrollable canvas + zoom friendly */
+    /* Desktop: BIG iframe so no inner scrollbars */
     @media (min-width: 901px) {
       body {
-        overflow: auto;
+        overflow: auto;   /* page scrolls, not iframe */
         background: #202124;
       }
 
       .frame-wrap {
-        min-height: 100vh;
-        overflow: auto;
         padding: 24px;
         background: #202124;
+        overflow: visible; /* critical: prevents inner scroll area */
       }
 
       iframe {
-        width: 1400px;
-        height: 900px;
+        width: 1500px;     /* wide canvas */
+        height: 2200px;    /* tall enough to fit full report */
         border: 0;
         display: block;
         margin: 0 auto;
@@ -77,7 +76,7 @@
 
 <body>
 
-  <!-- Dark splash to prevent white flash -->
+  <!-- Splash to hide white flash -->
   <div id="splash">
     <img src="logo-192.png" alt="xG Portal">
   </div>
