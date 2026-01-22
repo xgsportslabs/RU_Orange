@@ -90,17 +90,34 @@
   </div>
 
   <script>
-    const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    // Detect iPhone specifically (not iPad)
+    const ua = navigator.userAgent || "";
+    const isIPhone = /iPhone/i.test(ua) && !/iPad/i.test(ua);
 
+    // General mobile detection
+    const isMobile = /Android|iPhone|iPad|iPod/i.test(ua);
+
+    // LINKS
+    // iPhone: use the share link to avoid cookie issues
+    const iPhoneDirectMobileLink = "https://lookerstudio.google.com/s/j2af-Nie_no";
+
+    // Other devices: keep using embeds
     const mobileEmbed = "https://lookerstudio.google.com/embed/reporting/19fb639e-3918-4b35-8152-d7ec268a7507/page/RJQlF";
     const webEmbed    = "https://lookerstudio.google.com/embed/reporting/2113149b-db81-406c-8456-3d80d2fba248/page/RJQlF";
 
     const frame = document.getElementById("frame");
-    frame.src = isMobile ? mobileEmbed : webEmbed;
 
-    frame.onload = () => {
-      document.getElementById("splash").style.display = "none";
-    };
+    if (isIPhone) {
+      // Go directly to the mobile share link (leaves the GitHub page)
+      window.location.replace(iPhoneDirectMobileLink);
+    } else {
+      // Stay embedded for everyone else
+      frame.src = isMobile ? mobileEmbed : webEmbed;
+
+      frame.onload = () => {
+        document.getElementById("splash").style.display = "none";
+      };
+    }
   </script>
 
 </body>
