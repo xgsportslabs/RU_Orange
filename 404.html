@@ -19,6 +19,7 @@
       height: 100%;
       background: #202124;
       font-family: Arial, sans-serif;
+      color: #fff;
     }
 
     /* Splash while loading */
@@ -27,70 +28,7 @@
       inset: 0;
       background: #202124;
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
-      z-index: 9999;
-    }
-
-    /* Stage centers the scaled content and allows page scroll if needed */
-    .stage {
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 16px;
-      box-sizing: border-box;
-    }
-
-    /* Wrapper will be scaled with transform */
-    .wrap {
-      transform-origin: top left;
-    }
-
-    iframe {
-      border: 0;
-      display: block;
-      background: transparent;
-    }
-
-    /* Simple zoom UI */
-    .zoombar {
-      position: fixed;
-      right: 12px;
-      bottom: 12px;
-      display: flex;
-      gap: 8px;
-      z-index: 10000;
-    }
-    .zoombar button {
-      width: 44px;
-      height: 44px;
-      border-radius: 10px;
-      border: 0;
-      cursor: pointer;
-      font-size: 20px;
-      background: rgba(255,255,255,0.12);
-      color: white;
-      backdrop-filter: blur(6px);
-    }
-    .zoombar button:active { transform: scale(0.98); }
-  </style>
-</head>
-
-<body>
-
-<div id="splash">
-  <img src="logo-192.png" width="96" alt="xG Portal" />
-</div>
-
-<div class="stage" id="stage">
-  <div class="wrap" id="wrap">
-    <iframe
-      id="frame"
-      sandbox="allow-storage-access-by-user-activation allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"
-      allowfullscreen>
-    </iframe>
-  </div>
-</div>
-
-<div class="zoombar" aria-label="Zoom control
+      gap
