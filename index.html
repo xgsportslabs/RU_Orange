@@ -31,4 +31,216 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap
+      gap: 14px;
+      z-index: 9999;
+      padding: 24px;
+      box-sizing: border-box;
+      text-align: center;
+    }
+    #splash img { width: 96px; height: 96px; }
+    #splash .small { opacity: 0.8; font-size: 13px; max-width: 520px; }
+
+    #fallback {
+      display: none;
+      gap: 10px;
+      flex-direction: column;
+      align-items: center;
+    }
+    #fallback button {
+      border: 0;
+      border-radius: 10px;
+      padding: 12px 16px;
+      font-size: 16px;
+      cursor: pointer;
+      background: rgba(255,255,255,0.12);
+      color: #fff;
+    }
+
+    /* Stage centers the scaled content and allows page scroll if needed */
+    .stage {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      box-sizing: border-box;
+    }
+
+    /* Wrapper will be scaled with transform */
+    .wrap { transform-origin: top left; }
+
+    iframe {
+      border: 0;
+      display: block;
+      background: transparent;
+    }
+
+    /* Zoom UI */
+    .zoombar {
+      position: fixed;
+      right: 12px;
+      bottom: 12px;
+      display: flex;
+      gap: 8px;
+      z-index: 10000;
+    }
+    .zoombar button {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      border: 0;
+      cursor: pointer;
+      font-size: 20px;
+      background: rgba(255,255,255,0.12);
+      color: white;
+      backdrop-filter: blur(6px);
+    }
+    .zoombar button:active { transform: scale(0.98); }
+  </style>
+</head>
+
+<body>
+
+<div id="splash">
+  <img src="logo-192.png" alt="xG Portal" />
+  <div>Loading xG Portal…</div>
+  <div class="small" id="debugLine"></div>
+
+  <div id="fallback">
+    <div class="small">
+      If your device blocks embedded content (common with some cookie / privacy settings),
+      open the report directly:
+    </div>
+    <button type="button" id="openDirect">Open directly</button>
+  </div>
+</div>
+
+<div class="stage" id="stage">
+  <div class="wrap" id="wrap">
+    <iframe
+      id="frame"
+      sandbox="allow-storage-access-by-user-activation allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"
+      allowfullscreen>
+    </iframe>
+  </div>
+</div>
+
+<div class="zoombar" aria-label="Zoom controls">
+  <button type="button" id="zoomOut" title="Zoom out">−</button>
+  <button type="button" id="zoomReset" title="Reset zoom">⟳</button>
+  <button type="button" id="zoomIn" title="Zoom in">+</button>
+</div>
+
+<script>
+  const ua = navigator.userAgent || "";
+  const isMobile = /Android|iPhone|iPad|iPod/i.test(ua);
+
+  // Embed URLs (from your latest)
+  const mobileEmbed = "https://lookerstudio.google.com/embed/reporting/19fb639e-3918-4b35-8152-d7ec268a7507/page/RJQlF";
+  const webEmbed    = "https://lookerstudio.google.com/embed/reporting/2113149b-db81-406c-8456-3d80d2fba248/page/RJQlF";
+
+  // Optional direct (non-embed) fallbacks if iframe is blocked:
+  const mobileDirect = "https://lookerstudio.google.com/reporting/19fb639e-3918-4b35-8152-d7ec268a7507/page/RJQlF";
+  const webDirect    = "https://lookerstudio.google.com/reporting/2113149b-db81-406c-8456-3d80d2fba248/page/RJQlF";
+
+  // "Native" sizes you gave
+  const MOBILE_W = 375, MOBILE_H = 1000; // fit-to-width default
+  const WEB_W    = 600, WEB_H    = 450;  // fit-to-height default
+
+  const frame = document.getElementById("frame");
+  const wrap  = document.getElementById("wrap");
+  const stage = document.getElementById("stage");
+  const splash = document.getElementById("splash");
+  const fallback = document.getElementById("fallback");
+  const debugLine = document.getElementById("debugLine");
+
+  let userZoom = 1;
+  let baseScale = 1;
+
+  function clamp(n, lo, hi) { return Math.max(lo, Math.min(hi, n)); }
+
+  function pick() {
+    if (isMobile) {
+      return {
+        src: mobileEmbed,
+        direct: mobileDirect,
+        w: MOBILE_W,
+        h: MOBILE_H,
+        mode: "mobile (fit width)"
+      };
+    }
+    return {
+      src: webEmbed,
+      direct: webDirect,
+      w: WEB_W,
+      h: WEB_H,
+      mode: "desktop (fit height)"
+    };
+  }
+
+  const chosen = pick();
+  debugLine.textContent = `Mode: ${chosen.mode}`;
+
+  function computeBaseScale() {
+    const pad = 32;
+    const availW = Math.max(320, window.innerWidth - pad);
+    const availH = Math.max(320, window.innerHeight - pad);
+
+    if (isMobile) {
+      baseScale = availW / chosen.w; // fit-to-width
+    } else {
+      baseScale = availH / chosen.h; // fit-to-height
+    }
+    baseScale = clamp(baseScale, 0.4, 2.5);
+  }
+
+  function applyScale() {
+    const s = clamp(baseScale * userZoom, 0.3, 4);
+    wrap.style.transform = `scale(${s})`;
+    stage.style.minHeight = Math.ceil(chosen.h * s) + 32 + "px";
+  }
+
+  // Zoom buttons
+  document.getElementById("zoomIn").onclick = () => { userZoom = clamp(userZoom * 1.15, 0.3, 4); applyScale(); };
+  document.getElementById("zoomOut").onclick = () => { userZoom = clamp(userZoom / 1.15, 0.3, 4); applyScale(); };
+  document.getElementById("zoomReset").onclick = () => { userZoom = 1; applyScale(); };
+
+  // Set iframe size + src
+  frame.width = chosen.w;
+  frame.height = chosen.h;
+
+  // Important: set src AFTER sizing
+  frame.src = chosen.src;
+
+  // If iframe does load, hide splash
+  let loaded = false;
+  frame.addEventListener("load", () => {
+    loaded = true;
+    splash.style.display = "none";
+  });
+
+  // If it doesn't load (blocked), show fallback after 6s
+  setTimeout(() => {
+    if (!loaded) {
+      // show a way out
+      fallback.style.display = "flex";
+      document.getElementById("openDirect").onclick = () => {
+        window.location.href = chosen.direct;
+      };
+      // don't trap user behind the splash forever
+      // (also lets them see if iframe rendered but load event didn't fire)
+      splash.style.pointerEvents = "auto";
+    }
+  }, 6000);
+
+  // Fit scaling on load + resize
+  computeBaseScale();
+  applyScale();
+  window.addEventListener("resize", () => {
+    computeBaseScale();
+    applyScale();
+  });
+</script>
+
+</body>
+</html>
