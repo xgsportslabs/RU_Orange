@@ -16,23 +16,28 @@
   <style>
     html, body {
       margin: 0;
-      height: 100%;
       background: #202124;
-      display: flex;
-      align-items: center;
-      justify-content: center;
       font-family: Arial, sans-serif;
       color: white;
+    }
+
+    /* iOS-friendly first paint */
+    body {
+      height: 100vh;
+      display: grid;
+      place-items: center;
     }
 
     .frame {
       text-align: center;
       opacity: 0.9;
+      transform: translateZ(0); /* encourage crisp GPU paint on iOS */
     }
 
     .frame img {
       width: 110px;
       margin-bottom: 20px;
+      image-rendering: -webkit-optimize-contrast; /* optional iOS crispness */
     }
 
     .frame p {
@@ -43,7 +48,7 @@
   </style>
 
   <script>
-    // Small delay so the branded screen actually renders before redirect
+    // Small delay so the branded screen actually renders before redirect (without iOS blur)
     window.onload = () => {
       const ua = navigator.userAgent || "";
       const isMobile = /Android|iPhone|iPad|iPod/i.test(ua);
@@ -51,9 +56,16 @@
       const mobileURL = "https://lookerstudio.google.com/s/j2af-Nie_no";
       const webURL = "https://lookerstudio.google.com/reporting/2113149b-db81-406c-8456-3d80d2fba248/page/RJQlF";
 
-      setTimeout(() => {
-        window.location.replace(isMobile ? mobileURL : webURL);
-      }, 600); // enough time to show branding
+      const target = isMobile ? mobileURL : webURL;
+
+      // Force a proper layout + paint before redirect (helps iOS Safari blur)
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          setTimeout(() => {
+            window.location.replace(target);
+          }, 400);
+        });
+      });
     };
   </script>
 </head>
