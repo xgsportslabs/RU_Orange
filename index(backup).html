@@ -5,12 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>xG Portal</title>
 
-  <!-- Icons / PWA -->
+  <!-- PWA / Icons -->
   <link rel="manifest" href="manifest.json">
   <link rel="icon" href="favicon.ico">
-  <link rel="apple-touch-icon" href="logo-192.png">
+
+  <!-- iOS Home Screen Icon -->
+  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+
+  <!-- iOS App Behavior -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="xG Portal">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
   <meta name="theme-color" content="#202124">
 
   <style>
@@ -40,7 +46,7 @@
     }
 
     .splash img {
-      width: 110px;
+      width: 140px;
       margin-bottom: 20px;
       image-rendering: -webkit-optimize-contrast;
     }
@@ -71,7 +77,7 @@
   <!-- Splash -->
   <div class="splash" id="splash">
     <div style="text-align:center">
-      <img src="logo-192.png" alt="xG Portal">
+      <img src="logo-512.png" alt="xG Portal">
       <p>Opening xG Portal…</p>
     </div>
   </div>
@@ -103,7 +109,7 @@
       const portal = document.getElementById("portal");
       const splash = document.getElementById("splash");
 
-      // Let splash paint first (your original iOS trick)
+      // Let splash paint first (your iOS crisp trick)
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
           setTimeout(() => {
