@@ -1,133 +1,55 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <!-- viewport-fit helps iOS full-bleed -->
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>xG Portal (Embed)</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>xG Portal (Embed)</title>
 
-  <link rel="manifest" href="manifest.json">
-  <link rel="icon" href="favicon.ico">
-  <link rel="apple-touch-icon" href="logo-192.png">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-title" content="xG Portal">
-  <meta name="theme-color" content="#202124">
+<style>
+  html, body {
+    margin: 0;
+    background: #202124;
+    font-family: Arial, sans-serif;
+  }
 
-  <style>
-    :root { --bg: #202124; }
+  .wrap {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+  }
 
-    html, body {
-      margin: 0;
-      padding: 0;
-      background: var(--bg);
-      width: 100%;
-      height: 100%;
-      overflow: hidden; /* prevent OUTER page scrollbar */
-      font-family: Arial, sans-serif;
-      color: white;
-    }
-
-    /* Use a fixed-position wrapper so iOS viewport changes don’t “steal” scroll */
-    .stage {
-      position: fixed;
-      inset: 0;
-      background: var(--bg);
-    }
-
-    /* Prefer dynamic viewport height on mobile (fixes “can’t reach bottom”) */
-    iframe {
-      width: 100vw;
-      height: 100vh;   /* fallback */
-      height: 100svh;  /* stable viewport height (iOS) */
-      height: 100dvh;  /* dynamic viewport height (newer browsers) */
-      border: 0;
-      display: none;   /* show after src set */
-      background: var(--bg);
-
-      /* help touch scrolling in some mobile browsers */
-      touch-action: pan-y;
-    }
-
-    .splash {
-      height: 100vh;
-      height: 100svh;
-      height: 100dvh;
-      display: grid;
-      place-items: center;
-      text-align: center;
-      opacity: 0.9;
-      transform: translateZ(0);
-    }
-
-    .splash img {
-      width: 110px;
-      margin-bottom: 20px;
-      image-rendering: -webkit-optimize-contrast;
-    }
-
-    .splash p {
-      margin: 0;
-      font-size: 18px;
-      letter-spacing: 0.5px;
-    }
-  </style>
+  iframe {
+    border: 0;
+    display: block;
+  }
+</style>
 </head>
 
 <body>
-  <div class="stage">
-    <div class="splash" id="splash">
-      <div>
-        <img src="logo-192.png" alt="xG Portal">
-        <p>Loading xG Portal…</p>
-      </div>
-    </div>
 
-    <iframe
-      id="portal"
-      title="xG Portal"
-      scrolling="yes"
-      allowfullscreen
-      referrerpolicy="strict-origin-when-cross-origin"
-    ></iframe>
-  </div>
+<div class="wrap">
+  <iframe id="portal" allowfullscreen
+    sandbox="allow-storage-access-by-user-activation allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox">
+  </iframe>
+</div>
 
-  <script>
-    // Add rm=minimal to reduce Looker Studio embed chrome (cleaner + more space)
-    const EMBED_WEB_BASE =
-      "https://lookerstudio.google.com/embed/reporting/2113149b-db81-406c-8456-3d80d2fba248/page/RJQlF";
-    const EMBED_MOBILE_BASE =
-      "https://lookerstudio.google.com/embed/reporting/19fb639e-3918-4b35-8152-d7ec268a7507/page/RJQlF";
+<script>
+  const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 
-    function withMinimal(url) {
-      // If you already have ?something, append &rm=minimal; otherwise ?rm=minimal
-      return url + (url.includes("?") ? "&" : "?") + "rm=minimal";
-    }
+  const iframe = document.getElementById("portal");
 
-    function isMobileDevice() {
-      const ua = navigator.userAgent || "";
-      return /Android|iPhone|iPad|iPod/i.test(ua) || window.matchMedia("(max-width: 768px)").matches;
-    }
+  if (isMobile) {
+    // Mobile canvas size from Looker, with extra height for easier scrolling
+    iframe.width = "375";
+    iframe.height = "1050";   // <— slightly taller than 900
+    iframe.src = "https://lookerstudio.google.com/embed/reporting/19fb639e-3918-4b35-8152-d7ec268a7507/page/RJQlF";
+  } else {
+    // Web canvas size from Looker
+    iframe.width = "600";
+    iframe.height = "450";
+    iframe.src = "https://lookerstudio.google.com/embed/reporting/2113149b-db81-406c-8456-3d80d2fba248/page/RJQlF";
+  }
+</script>
 
-    // Pass through params if you ever add them to the GitHub Pages URL
-    const passthrough = window.location.search + window.location.hash;
-
-    const iframe = document.getElementById("portal");
-    const splash = document.getElementById("splash");
-
-    const base = isMobileDevice() ? EMBED_MOBILE_BASE : EMBED_WEB_BASE;
-    const target = withMinimal(base) + passthrough;
-
-    // Set src after paint (helps iOS rendering)
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        iframe.src = target;
-        iframe.style.display = "block";
-      });
-    });
-
-    iframe.addEventListener("load", () => {
-      splash.style.display = "none";
-    });
-  </script>
 </body>
 </html>
