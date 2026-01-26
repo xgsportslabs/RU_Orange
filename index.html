@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>xG Portal</title>
+
+  <!-- Icons / PWA -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="favicon.ico">
+  <link rel="apple-touch-icon" href="logo-192.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="xG Portal">
+  <meta name="theme-color" content="#202124">
+
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      background: #202124;
+      font-family: Arial, sans-serif;
+      overflow: hidden;
+    }
+
+    /* Splash screen */
+    .splash {
+      position: fixed;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      background: #202124;
+      z-index: 10;
+      transition: opacity 0.4s ease;
+    }
+
+    .splash.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .splash img {
+      width: 110px;
+      margin-bottom: 20px;
+      image-rendering: -webkit-optimize-contrast;
+    }
+
+    .splash p {
+      margin: 0;
+      font-size: 18px;
+      color: white;
+      letter-spacing: 0.5px;
+    }
+
+    /* Iframe container */
+    .portal {
+      position: fixed;
+      inset: 0;
+    }
+
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Splash -->
+  <div class="splash" id="splash">
+    <div style="text-align:center">
+      <img src="logo-192.png" alt="xG Portal">
+      <p>Opening xG Portal…</p>
+    </div>
+  </div>
+
+  <!-- Looker container -->
+  <div class="portal" id="portal"></div>
+
+  <script>
+    const ua = navigator.userAgent || "";
+    const isMobile = /Android|iPhone|iPad|iPod/i.test(ua);
+
+    const mobileEmbed = `
+      <iframe 
+        src="https://lookerstudio.google.com/embed/reporting/19fb639e-3918-4b35-8152-d7ec268a7507/page/RJQlF"
+        allowfullscreen
+        sandbox="allow-storage-access-by-user-activation allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox">
+      </iframe>
+    `;
+
+    const webEmbed = `
+      <iframe 
+        src="https://lookerstudio.google.com/embed/reporting/2113149b-db81-406c-8456-3d80d2fba248/page/RJQlF"
+        allowfullscreen
+        sandbox="allow-storage-access-by-user-activation allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox">
+      </iframe>
+    `;
+
+    window.onload = () => {
+      const portal = document.getElementById("portal");
+      const splash = document.getElementById("splash");
+
+      // Let splash paint first (your original iOS trick)
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          setTimeout(() => {
+            portal.innerHTML = isMobile ? mobileEmbed : webEmbed;
+            splash.classList.add("hidden");
+          }, 450);
+        });
+      });
+    };
+  </script>
+
+</body>
+</html>
