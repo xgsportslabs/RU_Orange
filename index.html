@@ -9,13 +9,8 @@
   <link rel="manifest" href="manifest.json">
   <link rel="icon" href="favicon.ico">
 
-  <!-- iOS Home Screen Icon (Add to Home Screen) -->
+  <!-- iOS Home Screen Icon -->
   <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
-
-  <!-- IMPORTANT:
-       We intentionally DO NOT set apple-mobile-web-app-capable on iOS,
-       so the Home Screen icon opens in Safari (not standalone web app mode).
-       This helps avoid iframe/third-party cookie limitations on iPhone. -->
 
   <meta name="theme-color" content="#202124">
 
@@ -93,7 +88,7 @@
       <iframe 
         src="https://lookerstudio.google.com/embed/reporting/19fb639e-3918-4b35-8152-d7ec268a7507/page/RJQlF"
         allowfullscreen
-        sandbox="allow-storage-access-by-user-activation allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox">
+        sandbox="allow-storage-access-by-user-activation allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-downloads">
       </iframe>
     `;
 
@@ -101,7 +96,7 @@
       <iframe 
         src="https://lookerstudio.google.com/embed/reporting/2113149b-db81-406c-8456-3d80d2fba248/page/RJQlF"
         allowfullscreen
-        sandbox="allow-storage-access-by-user-activation allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox">
+        sandbox="allow-storage-access-by-user-activation allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-downloads">
       </iframe>
     `;
 
@@ -109,17 +104,4 @@
       const portal = document.getElementById("portal");
       const splash = document.getElementById("splash");
 
-      // Let splash paint first (helps iOS crispness too)
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          setTimeout(() => {
-            portal.innerHTML = isMobile ? mobileEmbed : webEmbed;
-            splash.classList.add("hidden");
-          }, 450);
-        });
-      });
-    };
-  </script>
-
-</body>
-</html>
+      request
