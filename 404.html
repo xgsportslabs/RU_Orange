@@ -16,64 +16,104 @@
   <style>
     html, body {
       margin: 0;
+      padding: 0;
+      height: 100%;
       background: #202124;
       font-family: Arial, sans-serif;
-      color: white;
+      overflow: hidden;
     }
 
-    /* iOS-friendly first paint */
-    body {
-      height: 100vh;
+    /* Splash screen */
+    .splash {
+      position: fixed;
+      inset: 0;
       display: grid;
       place-items: center;
+      background: #202124;
+      z-index: 10;
+      transition: opacity 0.4s ease;
     }
 
-    .frame {
-      text-align: center;
-      opacity: 0.9;
-      transform: translateZ(0); /* encourage crisp GPU paint on iOS */
+    .splash.hidden {
+      opacity: 0;
+      pointer-events: none;
     }
 
-    .frame img {
+    .splash img {
       width: 110px;
       margin-bottom: 20px;
-      image-rendering: -webkit-optimize-contrast; /* optional iOS crispness */
+      image-rendering: -webkit-optimize-contrast;
     }
 
-    .frame p {
+    .splash p {
       margin: 0;
       font-size: 18px;
+      color: white;
       letter-spacing: 0.5px;
     }
+
+    /* Iframe container */
+    .portal {
+      position: fixed;
+      inset: 0;
+    }
+
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
   </style>
+</head>
+
+<body>
+
+  <!-- Splash -->
+  <div class="splash" id="splash">
+    <div style="text-align:center">
+      <img src="logo-192.png" alt="xG Portal">
+      <p>Opening xG Portal…</p>
+    </div>
+  </div>
+
+  <!-- Looker container -->
+  <div class="portal" id="portal"></div>
 
   <script>
-    // Small delay so the branded screen actually renders before redirect (without iOS blur)
+    const ua = navigator.userAgent || "";
+    const isMobile = /Android|iPhone|iPad|iPod/i.test(ua);
+
+    const mobileEmbed = `
+      <iframe 
+        src="https://lookerstudio.google.com/embed/reporting/19fb639e-3918-4b35-8152-d7ec268a7507/page/RJQlF"
+        allowfullscreen
+        sandbox="allow-storage-access-by-user-activation allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox">
+      </iframe>
+    `;
+
+    const webEmbed = `
+      <iframe 
+        src="https://lookerstudio.google.com/embed/reporting/2113149b-db81-406c-8456-3d80d2fba248/page/RJQlF"
+        allowfullscreen
+        sandbox="allow-storage-access-by-user-activation allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox">
+      </iframe>
+    `;
+
     window.onload = () => {
-      const ua = navigator.userAgent || "";
-      const isMobile = /Android|iPhone|iPad|iPod/i.test(ua);
+      const portal = document.getElementById("portal");
+      const splash = document.getElementById("splash");
 
-      const mobileURL = "https://lookerstudio.google.com/s/j2af-Nie_no";
-      const webURL = "https://lookerstudio.google.com/reporting/2113149b-db81-406c-8456-3d80d2fba248/page/RJQlF";
-
-      const target = isMobile ? mobileURL : webURL;
-
-      // Force a proper layout + paint before redirect (helps iOS Safari blur)
+      // Let splash paint first (your original iOS trick)
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
           setTimeout(() => {
-            window.location.replace(target);
-          }, 400);
+            portal.innerHTML = isMobile ? mobileEmbed : webEmbed;
+            splash.classList.add("hidden");
+          }, 450);
         });
       });
     };
   </script>
-</head>
 
-<body>
-  <div class="frame">
-    <img src="logo-192.png" alt="xG Portal">
-    <p>Opening xG Portal…</p>
-  </div>
 </body>
 </html>
