@@ -1,86 +1,109 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>xG Portal (Embed)</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>xG Portal (Embed)</title>
 
-<style>
-  html, body {
-    margin: 0;
-    background: #202124;
-    font-family: Arial, sans-serif;
-  }
+  <!-- Optional: keep your PWA/icon polish -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="favicon.ico">
+  <link rel="apple-touch-icon" href="logo-192.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="xG Portal">
+  <meta name="theme-color" content="#202124">
 
-  .center {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    overflow: hidden;
-  }
+  <style>
+    html, body {
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      background: #202124;
+      overflow: hidden; /* key: no outer page scrolling */
+      font-family: Arial, sans-serif;
+      color: white;
+    }
 
-  /* Desktop scaling magic */
-  .scale-wrap {
-    transform-origin: top center;
-  }
+    /* Fullscreen iframe */
+    iframe {
+      width: 100vw;
+      height: 100vh;
+      border: 0;
+      display: none; /* shown after src set */
+      background: #202124;
+    }
 
-  iframe {
-    border: 0;
-    display: block;
-  }
+    /* Simple splash while iframe loads */
+    .splash {
+      height: 100vh;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      opacity: 0.9;
+      transform: translateZ(0);
+    }
 
-  /* Mobile fullscreen */
-  .mobile iframe {
-    width: 100vw;
-    height: 100vh;
-  }
-</style>
+    .splash img {
+      width: 110px;
+      margin-bottom: 20px;
+      image-rendering: -webkit-optimize-contrast;
+    }
+
+    .splash p {
+      margin: 0;
+      font-size: 18px;
+      letter-spacing: 0.5px;
+    }
+  </style>
 </head>
 
 <body>
+  <div class="splash" id="splash">
+    <div>
+      <img src="logo-192.png" alt="xG Portal">
+      <p>Loading xG Portal…</p>
+    </div>
+  </div>
 
-<div id="container"></div>
+  <iframe
+    id="portal"
+    title="xG Portal"
+    referrerpolicy="strict-origin-when-cross-origin"
+    allowfullscreen
+  ></iframe>
 
-<script>
-  const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  <script>
+    const EMBED_WEB =
+      "https://lookerstudio.google.com/embed/reporting/2113149b-db81-406c-8456-3d80d2fba248/page/RJQlF";
+    const EMBED_MOBILE =
+      "https://lookerstudio.google.com/embed/reporting/19fb639e-3918-4b35-8152-d7ec268a7507/page/RJQlF";
 
-  const container = document.getElementById("container");
+    function isMobileDevice() {
+      const ua = navigator.userAgent || "";
+      return /Android|iPhone|iPad|iPod/i.test(ua) || window.matchMedia("(max-width: 768px)").matches;
+    }
 
-  if (isMobile) {
-    // === MOBILE: full viewport like before ===
-    container.className = "mobile";
+    // If you later add URL params to your GitHub Pages embed link,
+    // this forwards them to Looker Studio (safe default).
+    const passthrough = window.location.search + window.location.hash;
 
-    container.innerHTML = `
-      <iframe
-        src="https://lookerstudio.google.com/embed/reporting/19fb639e-3918-4b35-8152-d7ec268a7507/page/RJQlF"
-        allowfullscreen
-        sandbox="allow-storage-access-by-user-activation allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox">
-      </iframe>
-    `;
+    const iframe = document.getElementById("portal");
+    const splash = document.getElementById("splash");
 
-  } else {
-    // === DESKTOP: scaled canvas ===
-    const baseWidth = 600;
-    const baseHeight = 450;
+    const target = (isMobileDevice() ? EMBED_MOBILE : EMBED_WEB) + passthrough;
 
-    // Scale based on screen width
-    const scale = Math.min(window.innerWidth / baseWidth, 2.2);
+    // Set src after a paint to avoid iOS weirdness
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        iframe.src = target;
+        iframe.style.display = "block";
+      });
+    });
 
-    container.className = "center";
-
-    container.innerHTML = `
-      <div class="scale-wrap" style="transform: scale(${scale}); width:${baseWidth}px; height:${baseHeight}px;">
-        <iframe
-          width="${baseWidth}"
-          height="${baseHeight}"
-          src="https://lookerstudio.google.com/embed/reporting/2113149b-db81-406c-8456-3d80d2fba248/page/RJQlF"
-          allowfullscreen
-          sandbox="allow-storage-access-by-user-activation allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox">
-        </iframe>
-      </div>
-    `;
-  }
-</script>
-
+    // Hide splash once the iframe reports load
+    iframe.addEventListener("load", () => {
+      splash.style.display = "none";
+    });
+  </script>
 </body>
 </html>
