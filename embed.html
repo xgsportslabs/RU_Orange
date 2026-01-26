@@ -12,42 +12,73 @@
     font-family: Arial, sans-serif;
   }
 
-  .wrap {
+  .center {
     width: 100%;
     display: flex;
     justify-content: center;
+    overflow: hidden;
+  }
+
+  /* Desktop scaling magic */
+  .scale-wrap {
+    transform-origin: top center;
   }
 
   iframe {
     border: 0;
     display: block;
   }
+
+  /* Mobile fullscreen */
+  .mobile iframe {
+    width: 100vw;
+    height: 100vh;
+  }
 </style>
 </head>
 
 <body>
 
-<div class="wrap">
-  <iframe id="portal" allowfullscreen
-    sandbox="allow-storage-access-by-user-activation allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox">
-  </iframe>
-</div>
+<div id="container"></div>
 
 <script>
   const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 
-  const iframe = document.getElementById("portal");
+  const container = document.getElementById("container");
 
   if (isMobile) {
-    // Mobile canvas size from Looker, with extra height for easier scrolling
-    iframe.width = "375";
-    iframe.height = "1050";   // <— slightly taller than 900
-    iframe.src = "https://lookerstudio.google.com/embed/reporting/19fb639e-3918-4b35-8152-d7ec268a7507/page/RJQlF";
+    // === MOBILE: full viewport like before ===
+    container.className = "mobile";
+
+    container.innerHTML = `
+      <iframe
+        src="https://lookerstudio.google.com/embed/reporting/19fb639e-3918-4b35-8152-d7ec268a7507/page/RJQlF"
+        allowfullscreen
+        sandbox="allow-storage-access-by-user-activation allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox">
+      </iframe>
+    `;
+
   } else {
-    // Web canvas size from Looker
-    iframe.width = "600";
-    iframe.height = "450";
-    iframe.src = "https://lookerstudio.google.com/embed/reporting/2113149b-db81-406c-8456-3d80d2fba248/page/RJQlF";
+    // === DESKTOP: scaled canvas ===
+    const baseWidth = 600;
+    const baseHeight = 450;
+
+    // Scale based on screen width
+    const scale = Math.min(window.innerWidth / baseWidth, 2.2);
+
+    container.className = "center";
+
+    container.innerHTML = `
+      <div class="scale-wrap" style="transform: scale(${scale}); width:${baseWidth}px; height:${baseHeight}px;">
+        <iframe
+          width="${baseWidth}"
+          height="${baseHeight}"
+          src="https://lookerstudio.google.com/embed/reporting/2113149b-db81-406c-8456-3d80d2fba248/page/RJQlF"
+          allowfullscreen
+          sandbox="allow-storage-access-by-user-activation allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox">
+        </iframe>
+      </div>
+    `;
   }
 </script>
 
