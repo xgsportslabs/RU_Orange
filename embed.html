@@ -1,109 +1,102 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>xG Portal (Embed)</title>
-
-  <!-- Optional: keep your PWA/icon polish -->
-  <link rel="manifest" href="manifest.json">
-  <link rel="icon" href="favicon.ico">
-  <link rel="apple-touch-icon" href="logo-192.png">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-title" content="xG Portal">
-  <meta name="theme-color" content="#202124">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>xG Portal</title>
 
   <style>
     html, body {
       margin: 0;
+      padding: 0;
+      background: #202124;
+      height: 100%;
+      overflow: hidden;
+      font-family: Arial, sans-serif;
+    }
+
+    .wrap {
+      width: 100vw;
+      height: 100dvh;
+      background: #202124;
+    }
+
+    iframe {
       width: 100%;
       height: 100%;
-      background: #202124;
-      overflow: hidden; /* key: no outer page scrolling */
-      font-family: Arial, sans-serif;
-      color: white;
-    }
-
-    /* Fullscreen iframe */
-    iframe {
-      width: 100vw;
-      height: 100vh;
       border: 0;
-      display: none; /* shown after src set */
+      display: block;
       background: #202124;
     }
 
-    /* Simple splash while iframe loads */
-    .splash {
-      height: 100vh;
+    /* Optional loading overlay */
+    .loading {
+      position: fixed;
+      inset: 0;
       display: grid;
       place-items: center;
-      text-align: center;
-      opacity: 0.9;
-      transform: translateZ(0);
+      background: #202124;
+      z-index: 10;
+      transition: opacity 0.35s ease;
     }
-
-    .splash img {
+    .loading.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+    .loading img {
       width: 110px;
-      margin-bottom: 20px;
+      margin-bottom: 14px;
       image-rendering: -webkit-optimize-contrast;
     }
-
-    .splash p {
+    .loading p {
       margin: 0;
       font-size: 18px;
       letter-spacing: 0.5px;
+      color: #fff;
+      opacity: 0.9;
     }
   </style>
 </head>
 
 <body>
-  <div class="splash" id="splash">
-    <div>
+  <div class="loading" id="loading">
+    <div style="text-align:center">
       <img src="logo-192.png" alt="xG Portal">
       <p>Loading xG Portal…</p>
     </div>
   </div>
 
-  <iframe
-    id="portal"
-    title="xG Portal"
-    referrerpolicy="strict-origin-when-cross-origin"
-    allowfullscreen
-  ></iframe>
+  <div class="wrap">
+    <iframe id="frame" title="xG Portal" allowfullscreen></iframe>
+  </div>
 
   <script>
-    const EMBED_WEB =
-      "https://lookerstudio.google.com/embed/reporting/2113149b-db81-406c-8456-3d80d2fba248/page/RJQlF";
-    const EMBED_MOBILE =
+    const MOBILE_EMBED =
       "https://lookerstudio.google.com/embed/reporting/19fb639e-3918-4b35-8152-d7ec268a7507/page/RJQlF";
+    const WEB_EMBED =
+      "https://lookerstudio.google.com/embed/reporting/2113149b-db81-406c-8456-3d80d2fba248/page/RJQlF";
 
-    function isMobileDevice() {
+    function isMobile() {
       const ua = navigator.userAgent || "";
-      return /Android|iPhone|iPad|iPod/i.test(ua) || window.matchMedia("(max-width: 768px)").matches;
+      const iOSLike = /iPhone|iPad|iPod/i.test(ua) ||
+        (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+      const android = /Android/i.test(ua);
+      return iOSLike || android;
     }
 
-    // If you later add URL params to your GitHub Pages embed link,
-    // this forwards them to Looker Studio (safe default).
-    const passthrough = window.location.search + window.location.hash;
+    const frame = document.getElementById("frame");
+    frame.src = isMobile() ? MOBILE_EMBED : WEB_EMBED;
 
-    const iframe = document.getElementById("portal");
-    const splash = document.getElementById("splash");
+    frame.onload = () => {
+      document.getElementById("loading").classList.add("hidden");
+    };
 
-    const target = (isMobileDevice() ? EMBED_MOBILE : EMBED_WEB) + passthrough;
-
-    // Set src after a paint to avoid iOS weirdness
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        iframe.src = target;
-        iframe.style.display = "block";
-      });
-    });
-
-    // Hide splash once the iframe reports load
-    iframe.addEventListener("load", () => {
-      splash.style.display = "none";
-    });
+    // iOS viewport height fix (address bar resize)
+    function fixVH() {
+      document.querySelector(".wrap").style.height = window.innerHeight + "px";
+    }
+    window.addEventListener("resize", fixVH);
+    fixVH();
   </script>
 </body>
 </html>
